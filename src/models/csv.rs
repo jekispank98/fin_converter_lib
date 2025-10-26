@@ -13,9 +13,10 @@ impl <R: BufRead> Parser<R> for Csv {
         let mut line: String = String::new();
 
         while reader
-        .read_line(&mut line)
+        .read_line(&mut line) 
         .map_err(ParserError::Io)? > 0
          {
+             println!("{}", line);
              let parts: Vec<&str> = line.trim_end().split(',').collect();
 
             if parts.len() != 3 {
