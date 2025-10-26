@@ -4,7 +4,7 @@ use std::io::{BufRead, Read, Write};
 pub trait Parser<R: BufRead> {
     type Item;
     type Error;
-    fn parse(&mut self, reader: R) -> std::error::Result<Vec<Self::Item>, Self::Error>;
+    fn parse(&mut self, reader: R) -> Result<Vec<Self::Item>, Self::Error>;
 }
 
 /** Deserialize a record from thread */
