@@ -4,6 +4,6 @@ pub mod result;
 pub mod handler;
 pub mod models;
 
-pub use models::csv::Csv;
+pub use models::csv::CsvParser;
 
 
