@@ -2,9 +2,9 @@ use std::io::BufRead;
 use crate::handler::Parser;
 use crate::models::financial_record::FinancialRecord;
 use crate::error::ParserError;
-pub struct Csv;
+pub struct CsvParser;
 
-impl <R: BufRead> Parser<R> for Csv {
+impl <R: BufRead> Parser<R> for CsvParser {
     type Item = FinancialRecord;
     type Error = ParserError;
 
