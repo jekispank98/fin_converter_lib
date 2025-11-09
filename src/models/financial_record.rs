@@ -1,7 +1,6 @@
-use bincode::Decode;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Decode)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FinancialRecord {
     #[serde(rename = "TX_ID")]
     pub tx_id: i64,
