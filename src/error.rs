@@ -1,10 +1,15 @@
 use std::io;
-use bincode::error::DecodeError;
+use std::string::FromUtf8Error;
 
 #[derive(Debug)]
 pub enum ParserError {
     Io(io::Error),
     Format(String),
+    InvalidMagic([u8; 4]),
+    InvalidRecordSize(u32),
+    UnknownTxType(u8),
+    UnknownStatus(u8),
+    Utf8(FromUtf8Error),
 }
 
 impl From<io::Error> for ParserError {
@@ -12,16 +17,8 @@ impl From<io::Error> for ParserError {
         ParserError::Io(e)
     }
 }
-
-impl From<DecodeError> for ParserError {
-    fn from(e: DecodeError) -> Self {
-        match e {
-            DecodeError::Io { inner: io_err, additional: _ } => {
-                ParserError::Io(io_err)
-            },
-
-            // Все остальные ошибки формата
-            _ => ParserError::Format(format!("Bincode Decoding Error: {}", e)),
-        }
+impl From<FromUtf8Error> for ParserError {
+    fn from(e: FromUtf8Error) -> Self {
+        ParserError::Utf8(e)
     }
-}
+}  

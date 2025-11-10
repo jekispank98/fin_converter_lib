@@ -7,4 +7,4 @@ edition = "2024"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_yaml = "0.9"
 csv = "1"
-bincode    = { version = "2.0.0-rc3", features = ["serde"] }
+byteorder = "1.4"
