@@ -77,7 +77,7 @@ fn read_one_record<R: Read>(reader: &mut R) -> Result<FinancialRecord, ParserErr
     Ok(financial_record)
 }
 
-impl<R: BufRead> Parser<R> for Bin {
+impl<R: Read> Parser<R> for Bin {
     type Item = FinancialRecord;
     type Error = ParserError;
 
