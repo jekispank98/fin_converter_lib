@@ -8,14 +8,14 @@ use std::io::{BufRead, Read, Write, ErrorKind};
 const MAGIC_HEADER: [u8; 4] = [0x59, 0x50, 0x42, 0x4E];
 
 /* Field's sizes*/
-const SIZE_RECORD_SIZE:     usize = 4;
+/*const SIZE_RECORD_SIZE:     usize = 4;
 const SIZE_TX_ID:           usize = 8;
 const SIZE_TX_TYPE:         usize = 1;
 const SIZE_USER_ID:         usize = 8;
 const SIZE_AMOUNT:          usize = 8;
 const SIZE_TIMESTAMP:       usize = 8;
 const SIZE_STATUS:          usize = 1;
-const SIZE_DESC_LEN:        usize = 4;
+const SIZE_DESC_LEN:        usize = 4;*/
 
 /* Enum's codes */
 const TX_TYPE_DEPOSIT:      u8 = 0;
