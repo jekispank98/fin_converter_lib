@@ -1,7 +1,7 @@
-use std::io::{BufRead, BufReader, Read, Write};
 use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
-use crate::models::financial_record::{FinancialRecord};
+use crate::models::financial_record::FinancialRecord;
+use std::io::{BufRead, BufReader, Read, Write};
 
 pub struct Txt;
 
@@ -66,12 +66,10 @@ impl<W: Write> Serializer<W, FinancialRecord> for Txt {
 
     fn serialize(&self, items: &[FinancialRecord], mut writer: W) -> Result<(), Self::Error> {
         for (idx, rec) in items.iter().enumerate() {
-            writeln!(writer, "# Record {}", idx + 1)
-                .map_err(ParserError::Io)?;
+            writeln!(writer, "# Record {}", idx + 1).map_err(ParserError::Io)?;
             serde_yaml::to_writer(&mut writer, rec)
                 .map_err(|e| ParserError::Format(format!("YAML serialize error: {}", e)))?;
-            writer.write_all(b"\n")
-                .map_err(ParserError::Io)?;
+            writer.write_all(b"\n").map_err(ParserError::Io)?;
         }
         Ok(())
     }

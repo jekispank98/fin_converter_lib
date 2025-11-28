@@ -1,15 +1,14 @@
 use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
-use std::io::{BufRead, Read, Write};
 use csv::{ReaderBuilder, Trim, WriterBuilder};
+use std::io::{BufRead, Read, Write};
 
 pub struct Csv;
 
 impl<R: BufRead> Parser<R> for Csv {
     type Item = FinancialRecord;
     type Error = ParserError;
-
 
     fn parse(&mut self, reader: R) -> Result<Vec<Self::Item>, ParserError> {
         let mut rdr = ReaderBuilder::new()
@@ -20,8 +19,8 @@ impl<R: BufRead> Parser<R> for Csv {
 
         let mut records = Vec::new();
         for result in rdr.deserialize() {
-            let rec: FinancialRecord = result
-                .map_err(|e| ParserError::Format(format!("CSV parse error: {}", e)))?;
+            let rec: FinancialRecord =
+                result.map_err(|e| ParserError::Format(format!("CSV parse error: {}", e)))?;
             records.push(rec);
         }
         Ok(records)
@@ -40,8 +39,8 @@ impl<R: Read> Deserializer<R> for Csv {
             .from_reader(reader);
 
         if let Some(result) = rdr.deserialize().next() {
-            let rec: FinancialRecord = result
-                .map_err(|e| ParserError::Format(format!("CSV parse error: {}", e)))?;
+            let rec: FinancialRecord =
+                result.map_err(|e| ParserError::Format(format!("CSV parse error: {}", e)))?;
             Ok(rec)
         } else {
             Err(ParserError::Format("CSV is empty, no record found".into()))
