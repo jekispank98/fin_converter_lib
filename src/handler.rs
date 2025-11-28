@@ -1,4 +1,4 @@
-use std::io::{BufRead, Read, Write};
+use std::io::{Read, Write};
 
 /** Parse (read) financial record */
 pub trait Parser<R: Read> {

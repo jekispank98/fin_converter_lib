@@ -2,14 +2,11 @@ use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
-use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
-use std::fmt::format;
-use std::io::{BufRead, ErrorKind, Read, Write};
+use std::io::{ErrorKind, Read, Write};
 /* Header */
 const MAGIC_HEADER: [u8; 4] = [0x59, 0x50, 0x42, 0x4E];
 
 /* Field's sizes*/
-const SIZE_RECORD_SIZE: usize = 4;
 const SIZE_TX_ID: usize = 8;
 const SIZE_TX_TYPE: usize = 1;
 const SIZE_USER_ID: usize = 8;
@@ -23,7 +20,7 @@ const TX_TYPE_DEPOSIT: u8 = 0;
 const TX_TYPE_TRANSFER: u8 = 1;
 const TX_TYPE_WITHDRAWAL: u8 = 2;
 
-/* Result's coddes */
+/* Result's codes */
 const STATUS_SUCCESS: u8 = 0;
 const STATUS_FAILURE: u8 = 1;
 const STATUS_PENDING: u8 = 2;
@@ -73,7 +70,7 @@ fn read_one_record<R: Read>(reader: &mut R) -> Result<FinancialRecord, ParserErr
         status,
         description,
     };
-    print_one_record(&financial_record);
+    // print_one_record(&financial_record);
     Ok(financial_record)
 }
 
@@ -148,28 +145,4 @@ impl<W: Write> Serializer<W, FinancialRecord> for Bin {
         }
         Ok(())
     }
-}
-
-fn print_one_record(record: &FinancialRecord) {
-    let pattern = format!(
-        "Id: {}\nTx_type: {}\nFrom_user: {}\nTo_user: {}\nTimestamp: {}\nAmount: {}\nStatus: {}\nDescription: {}\n",
-        record.tx_id,
-        record.tx_type,
-        record.from_user_id,
-        record.to_user_id,
-        format_timestamp_millis(record.timestamp),
-        record.amount,
-        record.status,
-        record.description
-    );
-    println!("{}", pattern)
-}
-
-fn format_timestamp_millis(ts_millis: i64) -> String {
-    let datetime: DateTime<Local> = Local
-        .timestamp_millis_opt(ts_millis)
-        .single()
-        .expect("invalid timestamp");
-
-    datetime.format("%Y-%m-%d %H:%M:%S%.3f").to_string()
 }
