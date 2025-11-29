@@ -1,3 +1,14 @@
+//! Binary format integration tests for `fin_converter_lib`.
+//!
+//! What is covered here:
+//! - Serialize a list of `FinancialRecord` values to the custom binary format and parse them back
+//! - Deserialize a single record from a binary buffer
+//!
+//! Invariants validated indirectly by round-trips:
+//! - Magic header presence and consistency
+//! - Record size encoding is stable
+//! - Enumeration codes for `tx_type` and `status` map correctly during (de)serialization
+
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::bin::Bin;
 use crate::models::financial_record::FinancialRecord;

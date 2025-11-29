@@ -1,3 +1,10 @@
+//!CSV format integration tests for `fin_converter_lib`.
+//!
+//! What is covered here:
+//! - Parsing multiple records from a CSV stream with header
+//! - Deserializing a single record (first row after header)
+//! - Round-trip: serialize records to CSV then parse back and compare field-by-field
+
 use crate::models::financial_record::FinancialRecord;
 use crate::models::csv::Csv;
 use crate::handler::{Serializer, Parser, Deserializer};
@@ -41,7 +48,6 @@ fn assert_eq_record(a: &FinancialRecord, b: &FinancialRecord) {
 
 #[test]
 fn csv_parse_multiple_records() {
-    // Build CSV with header and two rows
     let csv_data = "TX_ID,TX_TYPE,FROM_USER_ID,TO_USER_ID,AMOUNT,TIMESTAMP,STATUS,DESCRIPTION\n\
 1,DEPOSIT,10,11,1000,1700000000,SUCCESS,hello\n\
 2,TRANSFER,12,13,-200,1700000100,PENDING,world\n";
@@ -74,8 +80,7 @@ fn csv_serialize_roundtrip() {
     let csv = Csv;
     let mut out: Vec<u8> = Vec::new();
     csv.serialize(&records, &mut out).expect("csv serialize");
-
-    // Now parse back
+    
     let mut csv2 = Csv;
     let cursor = Cursor::new(out);
     let parsed = csv2.parse(cursor).expect("csv parse back");

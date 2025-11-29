@@ -1,6 +1,13 @@
+//! YAML-like text format integration tests for `fin_converter_lib`.
+//!
+//! What is covered here:
+//! - Parsing multiple records from a text stream; lines starting with `#` are treated as comments and ignored
+//! - Deserializing a single record from a text buffer that may contain comments
+//! - Round-trip: serialize records to text then parse back and compare field-by-field
+
+use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
 use crate::models::text::Txt;
-use crate::handler::{Serializer, Parser, Deserializer};
 use std::io::Cursor;
 
 fn sample_records() -> Vec<FinancialRecord> {
