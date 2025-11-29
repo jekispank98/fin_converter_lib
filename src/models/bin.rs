@@ -1,28 +1,49 @@
+//! Custom binary format adapter for `FinancialRecord` (Big-Endian).
+
 use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{ErrorKind, Read, Write};
-/* Header */
+
+/// - Magic header: `59 50 42 4E` (ASCII "YPBN"), 4 bytes.
 const MAGIC_HEADER: [u8; 4] = [0x59, 0x50, 0x42, 0x4E];
 
-/* Field's sizes*/
+/// - TX_ID: `i64` (written as `u64` for non-negative, read as `u64` then cast to `i64`), 8 bytes.
 const SIZE_TX_ID: usize = 8;
+
+
+/// - TX_TYPE: `u8` code — 0 = DEPOSIT, 1 = TRANSFER, 2 = WITHDRAWAL, 1 byte.
 const SIZE_TX_TYPE: usize = 1;
+
+/// Size of a single user ID field (`FROM_USER_ID`/`TO_USER_ID`), 8 bytes (`u64` Big-Endian).
 const SIZE_USER_ID: usize = 8;
+
+/// Size of the `AMOUNT` field, 8 bytes (`i64` Big-Endian).
 const SIZE_AMOUNT: usize = 8;
+
+/// Size of the `TIMESTAMP` field, 8 bytes (`u64` Big-Endian).
 const SIZE_TIMESTAMP: usize = 8;
+/// Size of the `STATUS` enum code, 1 byte (`u8`).
 const SIZE_STATUS: usize = 1;
+
+/// Size of the `DESC_LEN` field, 4 bytes (`u32` Big-Endian). It specifies the length
+/// of the following `DESCRIPTION` byte sequence and does not include itself.
 const SIZE_DESC_LEN: usize = 4;
 
-/* Enum's codes */
+/// Transaction type code for `DEPOSIT`.
 const TX_TYPE_DEPOSIT: u8 = 0;
+/// Transaction type code for `TRANSFER`.
 const TX_TYPE_TRANSFER: u8 = 1;
+/// Transaction type code for `WITHDRAWAL`.
 const TX_TYPE_WITHDRAWAL: u8 = 2;
 
-/* Result's codes */
+
+/// Status code for `SUCCESS`.
 const STATUS_SUCCESS: u8 = 0;
+/// Status code for `FAILURE`.
 const STATUS_FAILURE: u8 = 1;
+/// Status code for `PENDING`.
 const STATUS_PENDING: u8 = 2;
 pub struct Bin;
 
@@ -70,7 +91,6 @@ fn read_one_record<R: Read>(reader: &mut R) -> Result<FinancialRecord, ParserErr
         status,
         description,
     };
-    // print_one_record(&financial_record);
     Ok(financial_record)
 }
 

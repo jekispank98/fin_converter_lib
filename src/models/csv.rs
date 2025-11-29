@@ -1,9 +1,12 @@
+//! CSV format adapter for `FinancialRecord`.
+//! This module provides a thin wrapper over the `csv` crate to parse/deserialize
+//! and serialize `FinancialRecord` values.
+
 use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
 use csv::{ReaderBuilder, Trim, WriterBuilder};
 use std::io::{BufRead, Read, Write};
-
 pub struct Csv;
 
 impl<R: BufRead> Parser<R> for Csv {

@@ -1,3 +1,10 @@
+//! YAML-like text format adapter for `FinancialRecord`.
+//! This module reads and writes records as YAML blocks separated by optional
+//! comment markers. It supports next operations:
+//! - Batch parsing (`Parser`): read multiple records from a buffer of lines.
+//! - Single-record deserialization (`Deserializer`): read exactly one record.
+//! - Serialization (`Serializer`): write records as YAML blocks with `# Record N` headers.
+
 use crate::error::ParserError;
 use crate::handler::{Deserializer, Parser, Serializer};
 use crate::models::financial_record::FinancialRecord;
@@ -47,7 +54,7 @@ impl<R: Read> Deserializer<R> for Txt {
 
     fn deserialize(&self, mut reader: R) -> Result<Self::Item, Self::Error> {
         let mut s = String::new();
-        reader.read_to_string(&mut s)?;
+        reader.read_to_string(&mut s);
 
         let yaml_only: String = s
             .lines()

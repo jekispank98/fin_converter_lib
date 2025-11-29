@@ -1,50 +1,48 @@
-use std::{fmt, io};
-use std::error::Error;
+//! Error types used by parsers and serializers in this crate.
+//! The central error enum [`ParserError`] represents failures that can occur
+//! while reading/writing data and interpreting it as one of the supported
+//! formats (CSV, YAML-like text, or the custom binary format).
+//! Notes
+//! - `ParserError` implements [`std::fmt::Display`] and [`std::error::Error`].
+//! - Conversions from underlying errors are provided via `From`:
+//!   - [`std::io::Error`] → [`ParserError::Io`]
+//!   - [`std::string::FromUtf8Error`] → [`ParserError::Utf8`]
+
+use std::io;
 use std::string::FromUtf8Error;
+use thiserror::Error;
 
-#[derive(Debug)]
+/// Error type shared by all parsers/deserializers/serializers in the crate.
+/// Variants cover I/O failures, textual/structural format issues, and
+/// binary-format specific problems. See the binary format documentation in
+/// [`models::bin`](crate::models::bin) for details about magic headers,
+/// record sizes, and enumeration codes.
+#[derive(Error, Debug)]
 pub enum ParserError {
-    Io(io::Error),
+    /// Underlying I/O error while reading from or writing to a stream.
+
+    #[error("I/O error: {0}")]
+    Io(#[from] io::Error),
+    /// Human-readable format error description.
+    #[error("Format error: {0}")]
     Format(String),
+    /// Binary format: magic header does not match the expected value.
+    /// The library expects the 4-byte header `0x59 0x50 0x42 0x4E` ("YPBN").
+    #[error("Invalid magic: {0:02X?}")]
     InvalidMagic([u8; 4]),
+    /// Binary format: the size field of a record is invalid or inconsistent.
+    #[error("Invalid record size: {0}")]
     InvalidRecordSize(u32),
+    /// Binary format: unknown transaction type code.
+    /// Expected codes are 0 = DEPOSIT, 1 = TRANSFER, 2 = WITHDRAWAL.
+    #[error("Unknown transaction type: {0}")]
     UnknownTxType(u8),
+    /// Binary format: unknown status code.
+    /// Expected codes are 0 = SUCCESS, 1 = FAILURE, 2 = PENDING.
+    #[error("Unknown status: {0}")]
     UnknownStatus(u8),
-    Utf8(FromUtf8Error),
-}
-
-impl From<io::Error> for ParserError {
-    fn from(e: io::Error) -> Self {
-        ParserError::Io(e)
-    }
-}
-impl From<FromUtf8Error> for ParserError {
-    fn from(e: FromUtf8Error) -> Self {
-        ParserError::Utf8(e)
-    }
-}
-
-impl fmt::Display for ParserError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ParserError::Io(e)               => write!(f, "I/O error: {}", e),
-            ParserError::Format(msg)        => write!(f, "Format error: {}", msg),
-            ParserError::InvalidMagic(m)     => write!(f, "Invalid magic: {:x?}", m),
-            ParserError::InvalidRecordSize(n)=> write!(f, "Invalid record size: {}", n),
-            ParserError::UnknownTxType(t)    => write!(f, "Unknown transaction type: {}", t),
-            ParserError::UnknownStatus(s)    => write!(f, "Unknown status: {}", s),
-            ParserError::Utf8(e)             => write!(f, "UTF-8 error: {}", e),
-        }
-    }
-}
-
-impl Error for ParserError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            ParserError::Io(e)   => Some(e),
-            ParserError::Utf8(e) => Some(e),
-            _                    => None,
-        }
-    }
+    /// UTF-8 decoding failed (e.g., textual description contained invalid bytes).
+    #[error("UTF-8 error: {0}")]
+    Utf8(#[from] FromUtf8Error),
 }
 
